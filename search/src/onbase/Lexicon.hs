@@ -6,9 +6,14 @@ import Onbase.DBTypes
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import Control.Arrow ((&&&))
+import qualified Data.Trie as T
+import qualified Data.ByteString.Char8 as C8
 
 completions :: Lexicon -> String -> [String]
-completions = undefined
+completions l s = map C8.unpack $ T.keys subtrie
+  where
+    trie = T.fromList $ map (\key -> (C8.pack key, ())) $ M.keys l
+    subtrie = T.submap (C8.pack s) trie
 
 type Lexicon = M.Map String (S.Set Entity)
 
