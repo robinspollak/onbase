@@ -14,6 +14,7 @@ import Onbase.SearchResult
 import Onbase.DBTypes
 import Onbase.Search
 import Onbase.SearchResult
+import Network.Wai.Middleware.Cors
 
 fromRight (Right a) = a
 
@@ -23,6 +24,8 @@ main = do
   players <- getAllPlayers
 
   scotty 3000 $ do
+
+    middleware simpleCors
 
     -- requires ?raw=...
     get "/v1/search" $ do
