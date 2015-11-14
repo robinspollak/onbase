@@ -1,0 +1,5 @@
+search:
+  image: haskell:7.10
+  volumes:
+    - ./search:/code
+  working_dir: /code
