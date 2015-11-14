@@ -9,10 +9,10 @@ data SearchResult = SearchResult
   , natlang :: String
   , natlangSubject :: String
   , filter :: Maybe FilterWrapper
-  }
+  } deriving (Show, Eq, Ord)
 
 data FilterWrapper = FilterWrapper
   { filterType :: String
   , value :: Time
   , filterNatlang :: String
-  }
+  } deriving (Show, Eq, Ord)

@@ -9,7 +9,11 @@ module Onbase.DBTypes (
 data Entity
   = Player { playerID :: String , nameFirst :: String , nameLast :: String }
   | Team { teamID :: String, teamName :: String }
-  deriving (Show, Eq, Ord)
+  deriving (Eq, Ord)
+
+instance Show Entity where
+  show p@(Player {}) = "<player: " ++ playerID p ++ ">"
+  show t@(Team {}) = "<team: " ++ teamID t ++ ">"
 
 entType :: Entity -> String
 entType (Player {}) = "player"
