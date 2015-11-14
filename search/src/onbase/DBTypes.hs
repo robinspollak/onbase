@@ -23,6 +23,7 @@ entName :: Entity -> String
 entName p@(Player {}) = nameFirst p ++ " " ++ nameLast p
 entName t@(Team {}) = teamName t
 
+-- | Example list of entities.
 entities :: [Entity]
 entities =
   [ Player { playerID = "arod", nameFirst = "Alex", nameLast = "Rodriguez" }

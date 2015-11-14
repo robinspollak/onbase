@@ -8,6 +8,7 @@ import qualified Data.Set as S
 import Control.Arrow ((&&&))
 import qualified Data.Trie as T
 import qualified Data.ByteString.Char8 as C8
+import qualified Data.Char as C
 
 completions :: Lexicon -> String -> [String]
 completions l s = map C8.unpack $ T.keys subtrie
@@ -25,7 +26,8 @@ keyWithValue :: ([String], Entity) -> [(String, Entity)]
 keyWithValue (terms, e) = map (\term -> (term, e)) terms
 
 keysWithValues :: [Entity] -> [(String, Entity)]
-keysWithValues ents = concat $ map keyWithValue $ map (words . entName &&& id) ents
+keysWithValues ents = concat $ map keyWithValue $
+  map (words . map C.toLower . entName &&& id) ents
 
 toSingletons :: [(String, Entity)] -> [(String, (S.Set Entity))]
 toSingletons = map (\(s, e) -> (s, S.singleton e))
