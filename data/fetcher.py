@@ -1,6 +1,7 @@
 # Start with relevant imports
 from __future__ import division
-from flask import Flask,request,json,jsonify,abort
+from collections import Counter
+from flask import Flask,request,json,jsonify,abort,Response
 import uuid,json
 from flask.ext.sqlalchemy import SQLAlchemy
 from models import *
@@ -22,12 +23,47 @@ def list_average(list1,list2):
 		averaged.append({"year":year,'value':round((value1/value2),3)})
 	return averaged
 
+def full_name(playerID):
+	return Master.query.filter_by(playerID=playerID).\
+	first().nameFirst+" "+Master.query.filter_by(playerID=playerID).\
+	first().nameLast
+
 def do_stats(player_stats,dict_):
 	stats = ['H','doubles','triples','HR','RBI','SB','R','AB']
 	for stat in stats:
-		dict_[stat] = object_to_data_dict(player_stats,stat)
+			dict_[stat] = object_to_data_dict(player_stats,stat)
 	dict_['BA'] = list_average(dict_['H'],dict_['AB'])
 
+def furthest_success(team_year):
+	if (team_year.WCWin=='Y' or team_year.divWin=='Y'):
+		won_division = (team_year.divWin=='Y')
+		if (team_year.LgWin=='Y'):
+			if (team_year.WSWin=='Y'):
+				return {"year":int(team_year.yearID),"value":'WWS'}
+			return {"year":int(team_year.yearID),"value":'LWS'}
+		if won_division: return {"year":int(team_year.yearID),"value":'WDV'}
+		return {"year":int(team_year.yearID),"value":'WWC'}
+	return {"year":int(team_year.yearID),"value":'NPO'}
+
+def team_leaders(teamID,f):
+	if (f == None):
+		return {'value':'no team leaders'}
+	if (type(f)==int):	
+		firstyear = f
+		lastyear = f
+	else:
+		firstyear = f["start"]
+		lastyear = f["end"]
+	list_of_players = Batting.query.filter_by(teamID=teamID).all()
+	list_of_players = filter(lambda x: (x.yearID>=firstyear and x.yearID<=lastyear),list_of_players)
+	for guy in list_of_players:
+		print guy.playerID
+		try:
+			guy = query_player_data(guy.playerID,f)
+		except:
+			pass
+
+	print list_of_players
 
 def filter_list_by_year(list_,year):
 	return filter(lambda x:(x.yearID==year),list_)
@@ -64,17 +100,61 @@ def query_player_data(playerID,f):
 		for year in range(f["start"],f["end"]+1):
 			relevant_stats.append(filter_list_by_year(player_stats,year)[0])
 		do_stats(relevant_stats,json_return)
-	return json_return
+	resp = Response(response=json.dumps(json_return),
+		status = 200, mimetype="application/json")
+	return resp
 
 		
+def query_team_data(teamID,f):
+	team_master = Teams.query.filter_by(teamID=teamID).all()
+	managers = Managers.query.filter_by(teamID=teamID).all() 
+	json_return = {}
+	json_return['stadium'] = team_master[-1].park
+	if (type(f)==int):
+		team_master = filter_list_by_year(team_master,f)
+		managers = filter_list_by_year(managers,f)
+	elif (f==None):
+		pass
+	else:
+		relevant_stats = []
+		relevant_managers = []
+		for year in range(f["start"],f["end"]+1):
+			relevant_stats.append(filter_list_by_year(team_master,year)[0])
+			relevant_managers.append(filter_list_by_year(managers,year)[0])
+		team_master = relevant_stats
+		managers = relevant_managers
+	json_return['furthest_success'] = map(furthest_success,team_master)
+	fields = ['attendance','W','L','Rank']
+	for field in fields:
+		json_return[field] = object_to_data_dict(team_master,field)
+	json_return["manager"] = Counter(map(lambda x: x.playerID,managers))[0]
+	json_return["manager"] = full_name(json_return["manager"])
+	resp = Response(response=json.dumps(json_return),
+		status = 200, mimetype="application/json")
+	return resp
+
+@app.route('/v1/data', methods=['POST'])
+def handle_data():
+	data = json.loads(request.data)
+	if (data["entity"] == "team"):
+		if "filter" in data:
+			if (data["filter"]==None): 
+				return query_team_data(data["id"],None)
+			return query_team_data(data["id"],data["filter"])
+		else:
+			return query_team_data(data["id"],None)
+	if (data["entity"] == "player"):
+		if "filter" in data:
+			if (data["filter"]==None): 
+				return query_player_data(data["id"],None)
+			return query_player_data(data["id"],data["filter"])
+		else:
+			return query_player_data(data["id"],None)
 
 
+	return 'bad query'
 
 
-
-
-hi = query_player_data('rodrial01',{"start":2008,"end":2010})
-print hi
 
 if __name__ == '__main__':
 	app.run(debug=True)

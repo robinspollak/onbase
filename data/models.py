@@ -264,8 +264,8 @@ class SeriesPost(db.Model):
 	losses = db.Column(db.Integer,primary_key=False,nullable=True)
 	ties = db.Column(db.Integer,primary_key=False,nullable=True)
 
-class Team(db.Model):
-	__tablename__ = 'Team'
+class Teams(db.Model):
+	__tablename__ = 'Teams'
 	yearID = db.Column(db.Integer,primary_key=True,nullable=False, default=0)
 	lgID = db.Column(db.String(2),primary_key=True,nullable=True)
 	teamID = db.Column(db.String(3),primary_key=True,nullable=True)
@@ -283,8 +283,8 @@ class Team(db.Model):
 	R = db.Column(db.Integer,primary_key=False,nullable=True)
 	AB = db.Column(db.Integer,primary_key=False,nullable=True)
 	H = db.Column(db.Integer,primary_key=False,nullable=True) 
-	double = db.Column(db.Integer,primary_key=False,nullable=True)
-	triple = db.Column(db.Integer,primary_key=False,nullable=True)
+	double = db.Column(db.Integer,primary_key=False,nullable=True,name="2b")
+	triple = db.Column(db.Integer,primary_key=False,nullable=True,name="3b")
 	HR = db.Column(db.Integer,primary_key=False,nullable=True)
 	BB = db.Column(db.Integer,primary_key=False,nullable=True)
 	SO = db.Column(db.Integer,primary_key=False,nullable=True)
@@ -308,7 +308,7 @@ class Team(db.Model):
 	FP = db.Column(db.Float,primary_key=False,nullable=True)
 	name = db.Column(db.String(50),primary_key=False,nullable=True)
 	park = db.Column(db.String(255),primary_key=False,nullable=True)
-	attendence = db.Column(db.Integer,primary_key=False,nullable=True)
+	attendance = db.Column(db.Integer,primary_key=False,nullable=True)
 	BPF = db.Column(db.Integer,primary_key=False,nullable=True)
 	PPF = db.Column(db.Integer,primary_key=False,nullable=True)
 	teamIDBR = db.Column(db.String(3),primary_key=False,nullable=True)
