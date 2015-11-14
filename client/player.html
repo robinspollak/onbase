@@ -1,0 +1,114 @@
+<html>
+  <head>
+    <title>Onbase</title>
+    <style>
+    	div.bg {
+    		position: fixed;
+    		top: 0;
+    		left: 0;
+    		width: 100%;
+    		height: 100%;
+    		background-image: url(http://thelandline.com/wp-content/uploads/2014/09/Baseball-Diamond.jpg);
+    		background-position: center; 
+    		  -webkit-filter: blur(5px);
+				-moz-filter: blur(5px);
+				-o-filter: blur(5px);
+				-ms-filter: blur(5px);
+				filter: blur(5px);
+			z-index: 0;
+			opacity: .7;
+    	}
+    	div.main {
+    		position: relative;
+    		z-index: 1000;
+    		text-align: center;
+    	}
+    	h1{
+    		text-align: center;
+			font-family: Garamond, Baskerville, 'Baskerville Old Face', 'Hoefler Text', 'Times New Roman', serif;
+			margin-top: 12%;
+			font-size: 125px;
+			margin-bottom: 3%;
+    	}
+    	.inputform{
+    		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    		width: 67%;
+    		height: 10%;
+    		padding: 0 25px;
+    		border-radius: 25px;
+    	}
+    	.inputform:focus{
+    		outline: none;
+    		border: none;
+    	}
+    </style>
+  </head>
+  <body ng-app="onbase">
+  	<div class="main" ng-controller="app">
+		<h1>onbase</h1>
+		<form>
+			<input class="inputform" placeholder="ask about baseball"></input>
+		</form>
+	</div>
+	<div class="bg"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular.min.js"></script>
+    <script>
+
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    var ob = angular.module('onbase', []);
+
+    ob.config(['$httpProvider', function($httpProvider) {
+        $httpProvider.defaults.useXDomain = true;
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
+    }]);
+
+    var id = getParameterByName('id');
+    var year = getParameterByName('year');
+    var start = getParameterByName('start');
+    var end = getParameterByName('end');
+
+    ob.controller('app', function($scope, $http) {
+
+        if (id) {
+
+            var filter;
+            if (year) {
+                filter = parseInt(year);
+            } else if (start && end) {
+                filter = {
+                    "start": parseInt(start),
+                    "end": parseInt(end)
+                };
+            }
+
+            $http({
+                method: 'POST',
+                url: 'http://localhost:5000/v1/data',
+                data: {
+                    "entity": "player",
+                    "id": id,
+                    "filter": filter
+                }
+            }).success(function(data) {
+                console.log(data);
+            });
+
+        } else {
+            throw new Error("fuck this");
+        }
+    });
+
+        // get the ?id url query string
+        // if one exists, get the ?year or ?years query strings - this is the year filter
+        // make an HTTP request to the python server with the appropriate JSON payload, formulated by the query strings
+        // when you get a response, do things with it
+
+    </script>
+  </body>
+</html>

@@ -5,6 +5,7 @@ from flask import Flask,request,json,jsonify,abort,Response
 import uuid,json
 from flask.ext.sqlalchemy import SQLAlchemy
 from models import *
+from flask.ext.cors import CORS
 
 def object_to_data_dict(arg,desired_field):
 	if (type(arg)==list):
@@ -74,10 +75,15 @@ def query_player_data(playerID,f):
 	player_appearances = Appearances.query.filter_by(playerID=playerID).all()
 	player_awards = AwardsPlayers.query.filter_by(playerID=playerID).all()
 	player_awards_votes = AwardsSharePlayers.query.filter_by(playerID=playerID).all()
-	if (player_appearances[0].G_p>10):
-		batter = False
-		player_stats = Pitching.query.filter_by(playerID=playerID).all()
-		player_post = PitchingPost.query.filter_by(playerID=playerID).all()
+	if (len(player_appearances)!=0):
+		if (player_appearances[0].G_p>10):
+			batter = False
+			player_stats = Pitching.query.filter_by(playerID=playerID).all()
+			player_post = PitchingPost.query.filter_by(playerID=playerID).all()
+		else:
+			batter = True
+			player_stats = Batting.query.filter_by(playerID=playerID).all()
+			player_post = BattingPost.query.filter_by(playerID=playerID).all()
 	else:
 		batter = True
 		player_stats = Batting.query.filter_by(playerID=playerID).all()
@@ -130,7 +136,7 @@ def query_team_data(teamID,f):
 	json_return["manager"] = Counter(map(lambda x: x.playerID,managers))[0]
 	json_return["manager"] = full_name(json_return["manager"])
 	resp = Response(response=json.dumps(json_return),
-		status = 200, mimetype="application/json")
+		status = 200, mimetype="application/json", headers={'Access-Control-Allow-Origin': '*'})
 	return resp
 
 @app.route('/v1/data', methods=['POST'])
@@ -157,6 +163,7 @@ def handle_data():
 
 
 if __name__ == '__main__':
+	CORS(app)
 	app.run(debug=True)
 
 
