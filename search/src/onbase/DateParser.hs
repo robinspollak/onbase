@@ -1,4 +1,8 @@
-module Onbase.DateParser where
+module Onbase.DateParser (
+  Time(..),
+  Year,
+  parseTimes
+) where
 
 import Text.Regex
 import qualified Data.Set as S
