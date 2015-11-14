@@ -86,8 +86,8 @@ class Batting(db.Model):
 	AB = db.Column(db.Integer,primary_key=False,nullable=True)
 	R = db.Column(db.Integer,primary_key=False,nullable=True)
 	H = db.Column(db.Integer,primary_key=False,nullable=True)
-	doubles = db.Column(db.Integer,primary_key=False,nullable=True)
-	triples = db.Column(db.Integer,primary_key=False,nullable=True)
+	doubles = db.Column(db.Integer,primary_key=False,nullable=True,name="2b")
+	triples = db.Column(db.Integer,primary_key=False,nullable=True,name="3b")
 	HR = db.Column(db.Integer,primary_key=False,nullable=True)
 	RBI = db.Column(db.Integer,primary_key=False,nullable=True)
 	SB = db.Column(db.Integer,primary_key=False,nullable=True)
@@ -104,7 +104,7 @@ class Batting(db.Model):
 class BattingPost(db.Model):
 	__tablename__ = 'BattingPost'
 	yearID = db.Column(db.Integer,primary_key=True,nullable=False, default=0)
-	round_ = db.Column(db.String(10),primary_key=True,nullable=False, default=0)
+	round_ = db.Column(db.String(10),primary_key=True,nullable=False, default=0,name="round")
 	playerID = db.Column(db.String(9),primary_key=True,nullable=False)
 	teamID = db.Column(db.String(3),primary_key=False,nullable=True)
 	lgID = db.Column(db.String(2),primary_key=False,nullable=True)
@@ -112,8 +112,8 @@ class BattingPost(db.Model):
 	AB = db.Column(db.Integer,primary_key=False,nullable=True)
 	R = db.Column(db.Integer,primary_key=False,nullable=True)
 	H = db.Column(db.Integer,primary_key=False,nullable=True)
-	doubles = db.Column(db.Integer,primary_key=False,nullable=True)
-	triples = db.Column(db.Integer,primary_key=False,nullable=True)
+	doubles = db.Column(db.Integer,primary_key=False,nullable=True,name="2b")
+	triples = db.Column(db.Integer,primary_key=False,nullable=True,name="3b")
 	HR = db.Column(db.Integer,primary_key=False,nullable=True)
 	RBI = db.Column(db.Integer,primary_key=False,nullable=True)
 	SB = db.Column(db.Integer,primary_key=False,nullable=True)
@@ -214,7 +214,7 @@ class Pitching(db.Model):
 class PitchingPost(db.Model):
 	__tablename__ = 'PitchingPost'
 	yearID = db.Column(db.Integer,primary_key=True,nullable=False, default=0)
-	round_ = db.Column(db.String(10),primary_key=True,nullable=False, default=0)
+	round_ = db.Column(db.String(10),primary_key=True,nullable=False, default=0,name="round")
 	playerID = db.Column(db.String(9),primary_key=True,nullable=False)
 	teamID = db.Column(db.String(3),primary_key=False,nullable=True)
 	lgID = db.Column(db.String(2),primary_key=False,nullable=True)
@@ -255,7 +255,7 @@ class Salaries(db.Model):
 class SeriesPost(db.Model):
 	__tablename__ = 'SeriesPost'
 	yearID = db.Column(db.Integer,primary_key=True,nullable=False, default=0)
-	round_ = db.Column(db.String(5),primary_key=True,nullable=False, default=0)
+	round_ = db.Column(db.String(5),primary_key=True,nullable=False, default=0,name="round")
 	teamIDwinner = db.Column(db.String(3),primary_key=False,nullable=True)
 	lgIDwinner = db.Column(db.String(2),primary_key=False,nullable=True)
 	teamIDloser = db.Column(db.String(3),primary_key=False,nullable=True)
