@@ -19,15 +19,14 @@ readYear s
 
 absolutePatterns :: [(String, TimeConstructor)]
 absolutePatterns = 
-  [ ("between ([[:digit:]]{2}|[[:digit:]]{4}) and ([[:digit:]]{2}|[[:digit:]]{4})", absoluteRangeConstructor)
-  , ("([[:digit:]]{2}|[[:digit:]]{4})\\w*-\\w*([[:digit:]]{2}|[[:digit:]]{4})", absoluteRangeConstructor)
-  , ("([[:digit:]]{2}|[[:digit:]]{4})", absoluteYearConstructor) ]
+  [ ("^([[:digit:]]{2}|[[:digit:]]{4})-([[:digit:]]{2}|[[:digit:]]{4})$", absoluteRangeConstructor . concat)
+  , ("^([[:digit:]]{2}|[[:digit:]]{4})$", absoluteYearConstructor . map head) ]
 
-absoluteRangeConstructor :: TimeConstructor
-absoluteRangeConstructor [start, end] = Just $ Range (readYear start) (readYear end)
+absoluteRangeConstructor :: [String] -> Maybe Time
+absoluteRangeConstructor [_, start, end] = Just $ Range (readYear start) (readYear end)
 absoluteRangeConstructor _ = Nothing
 
-absoluteYearConstructor :: TimeConstructor
+absoluteYearConstructor :: [String] -> Maybe Time
 absoluteYearConstructor [yr] = Just . Time $ readYear yr
 absoluteYearConstructor _ = Nothing
 
@@ -35,10 +34,9 @@ parseTimes :: String -> S.Set Time
 parseTimes str = S.fromList $ catMaybes $ map (applyPattern str) absolutePatterns
   where
     applyPattern :: String -> (String, TimeConstructor) -> Maybe Time
-    applyPattern s (pattern, constructor) = constructor $
-      map head (s =~ pattern :: [[String]])
+    applyPattern s (pattern, constructor) = constructor $ (s =~ pattern :: [[String]])
 
-type TimeConstructor = [String] -> Maybe Time
+type TimeConstructor = [[String]] -> Maybe Time
 type Year = Int
 data Time
   = Time Year
