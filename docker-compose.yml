@@ -1,0 +1,8 @@
+search:
+  image: haskell:7.10
+  volumes:
+    - ./search:/code
+  working_dir: /code
+  ports:
+    - 3000:3000
+  command: cabal run
