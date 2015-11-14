@@ -1,11 +1,14 @@
 module Onbase.Lexicon (
-  Lexicon, lexicon
+  Lexicon, lexicon, completions
 ) where
 
 import Onbase.DBTypes
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
-import Control.Arrow
+import Control.Arrow ((&&&))
+
+completions :: Lexicon -> String -> [String]
+completions = undefined
 
 type Lexicon = M.Map String (S.Set Entity)
 
