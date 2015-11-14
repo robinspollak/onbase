@@ -4,7 +4,7 @@ module Onbase.DateParser (
   parseTimes
 ) where
 
-import Text.Regex
+import Text.Regex.Posix
 import qualified Data.Set as S
 import Data.Maybe (catMaybes)
 
@@ -19,25 +19,26 @@ readYear s
 
 absolutePatterns :: [(String, TimeConstructor)]
 absolutePatterns = 
-  [ ("between (\\d{2}|\\d{4})( and |-)(\\d{2}\\d{4})", absoluteRangeConstructor)
-  , ("(\\d{2}|\\d{4})\\w*-\\w*(\\d{2}|\\d{4})", absoluteRangeConstructor)
-  , ("(\\d{2}|\\d{4})", absoluteYearConstructor) ]
+  [ ("between ([[:digit:]]{2}|[[:digit:]]{4}) and ([[:digit:]]{2}|[[:digit:]]{4})", absoluteRangeConstructor)
+  , ("([[:digit:]]{2}|[[:digit:]]{4})\\w*-\\w*([[:digit:]]{2}|[[:digit:]]{4})", absoluteRangeConstructor)
+  , ("([[:digit:]]{2}|[[:digit:]]{4})", absoluteYearConstructor) ]
 
-absoluteRangeConstructor :: [String] -> Time
-absoluteRangeConstructor [start, end] = Range (readYear start) (readYear end)
-absoluteRangeConstructor _ = error "can't construct range"
+absoluteRangeConstructor :: TimeConstructor
+absoluteRangeConstructor [start, end] = Just $ Range (readYear start) (readYear end)
+absoluteRangeConstructor _ = Nothing
 
-absoluteYearConstructor :: [String] -> Time
-absoluteYearConstructor [yr] = Time $ readYear yr
-absoluteYearConstructor _ = error "can't construct year"
+absoluteYearConstructor :: TimeConstructor
+absoluteYearConstructor [yr] = Just . Time $ readYear yr
+absoluteYearConstructor _ = Nothing
 
 parseTimes :: String -> S.Set Time
 parseTimes str = S.fromList $ catMaybes $ map (applyPattern str) absolutePatterns
   where
     applyPattern :: String -> (String, TimeConstructor) -> Maybe Time
-    applyPattern s (pattern, constructor) = fmap constructor $ matchRegex (mkRegex pattern) s
+    applyPattern s (pattern, constructor) = constructor $
+      map head (s =~ pattern :: [[String]])
 
-type TimeConstructor = [String] -> Time
+type TimeConstructor = [String] -> Maybe Time
 type Year = Int
 data Time
   = Time Year
