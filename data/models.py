@@ -6,9 +6,10 @@ from flask.ext.sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 # link to local sqlite database
 app.config['SQLALCHEMY_DATABASE_URI'] = \
-'mysql://mlb@localhost'
+'mysql://''@localhost/mlb'
 # initialize Database
 db = SQLAlchemy(app)
+
 
 class AllstarFull(db.Model):
 	__tablename__ = 'AllstarFull'
@@ -320,10 +321,7 @@ class TeamsFranchises(db.Model):
 	active = db.Column(db.String(2),primary_key=False,nullable=True)
 	NAassoc = db.Column(db.String(3),primary_key=False,nullable=True)
 
-
-
-
-
+db.session.commit()
 
 
 
