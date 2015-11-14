@@ -1,4 +1,6 @@
 module Onbase.SearchResult (
+  SearchResult(..),
+  FilterWrapper(..)
 ) where
 
 import Onbase.DateParser
