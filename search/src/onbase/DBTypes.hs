@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Onbase.DBTypes (
   Entity(..),
   entType,
@@ -6,10 +8,15 @@ module Onbase.DBTypes (
   entities
 ) where
 
+import Data.Csv
+import GHC.Generics
+
 data Entity
   = Player { playerID :: String , nameFirst :: String , nameLast :: String }
   | Team { teamID :: String, teamName :: String }
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Generic)
+
+instance FromRecord Entity
 
 instance Show Entity where
   show p@(Player {}) = "<player: " ++ playerID p ++ ">"

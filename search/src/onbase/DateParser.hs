@@ -1,14 +1,17 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Onbase.DateParser (
   Time(..),
-  Year,
   parseTimes
 ) where
 
 import Text.Regex.Posix
 import qualified Data.Set as S
 import Data.Maybe (catMaybes)
+import Data.Aeson
+import Data.Scientific
 
-readYear :: String -> Year
+readYear :: String -> Int
 readYear s@['0',_] = read $ "20" ++ s
 readYear s@['1',_] = read $ "20" ++ s
 readYear s@['2',_] = read $ "20" ++ s
@@ -37,8 +40,14 @@ parseTimes str = S.fromList $ catMaybes $ map (applyPattern str) absolutePattern
     applyPattern s (pattern, constructor) = constructor $ (s =~ pattern :: [[String]])
 
 type TimeConstructor = [[String]] -> Maybe Time
-type Year = Int
 data Time
-  = Time Year
-  | Range Year Year -- start and end
+  = Time Int
+  | Range  Int Int -- start and end
   deriving (Show, Eq, Ord)
+
+instance ToJSON Time where
+  toJSON (Time yr) = Number $ scientific (toInteger yr) 0
+  toJSON (Range yr yr') = object
+    [ "start" .= (Number $ scientific (toInteger yr) 0)
+    , "end" .= (Number $ scientific (toInteger yr') 0)
+    ]
